@@ -101,7 +101,7 @@ describe('SignUp Controller', () => {
     const { sut, emailValidatorStub } = makeSut()
     const isValidSpy = jest.spyOn(emailValidatorStub, 'isValid')
     await sut.handle(makeFakeRequest())
-    expect(isValidSpy).toHaveBeenCalledWith(makeFakeRequest().body.email)
+    expect(isValidSpy).toHaveBeenLastCalledWith(makeFakeRequest().body.email)
   })
   test('should return 500 if EmailValidator throws', async () => {
     const { sut, emailValidatorStub } = makeSut()
@@ -114,7 +114,7 @@ describe('SignUp Controller', () => {
     const addSpy = jest.spyOn(addAccountStub, 'add')
     await sut.handle(makeFakeRequest())
     const { name, email, password } = makeFakeRequest().body
-    expect(addSpy).toHaveBeenCalledWith({ name, email, password })
+    expect(addSpy).toHaveBeenLastCalledWith({ name, email, password })
   })
   test('should return 500 if AddAccount throws', async () => {
     const { sut, addAccountStub } = makeSut()
