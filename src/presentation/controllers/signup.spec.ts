@@ -1,7 +1,7 @@
+import { SignUpController } from './signup'
 import { MissingParamError, InvalidParamError } from '../errors'
 import { badRequest, serverError } from '../helpers/http-helper'
 import { EmailValidator } from '../protocols/email-validator'
-import { SignUpController } from './signup'
 
 function makeEmailValidator (): EmailValidator {
   class EmailValidatorStub implements EmailValidator {
