@@ -1,9 +1,7 @@
+import { MissingParamError, InvalidParamError } from '../../errors'
+import { badRequest, serverError } from '../../helpers/http-helper'
 import { SignUpController } from './signup'
-import { MissingParamError, InvalidParamError } from '../errors'
-import { badRequest, serverError } from '../helpers/http-helper'
-import { EmailValidator } from '../protocols/email-validator'
-import { AccountModel } from '../../domain/models/account'
-import { AddAccount, AddAccountModel } from '../../domain/usescases/add-account'
+import { EmailValidator, AccountModel, AddAccount, AddAccountModel } from './signup-protocols'
 
 function makeEmailValidator (): EmailValidator {
   class EmailValidatorStub implements EmailValidator {
