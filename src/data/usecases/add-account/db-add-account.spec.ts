@@ -2,14 +2,14 @@ import { AccountModel } from '../../../domain/models/account'
 import { DbAddAccount } from './db-add-account'
 import { AddAccountModel, Encrypter, AddAccountRepository } from './db-add-account-protocols'
 
-function makeFakeHash (): string {
-  return 'hashed_value'
+function makeFakeHashedPassword (): string {
+  return 'hashed_password'
 }
 
 function makeEncrypter (): Encrypter {
   class EncrypterStub implements Encrypter {
     async encrypt (_value: string): Promise<string> {
-      return await Promise.resolve(makeFakeHash())
+      return await Promise.resolve(makeFakeHashedPassword())
     }
   }
   return new EncrypterStub()
@@ -20,7 +20,7 @@ function makeFakeAccount (): AccountModel {
     id: 'any_id',
     name: 'any_name',
     email: 'any_email',
-    password: 'any_password'
+    password: 'hashed_password'
   }
 }
 
@@ -71,12 +71,20 @@ describe('DbAddAccount Usecase', () => {
     const { sut, addAccountRepositoryStub } = makeSut()
     const addSpy = jest.spyOn(addAccountRepositoryStub, 'add')
     await sut.add(makeFakeAccountData())
-    expect(addSpy).toHaveBeenLastCalledWith({ ...makeFakeAccountData(), password: makeFakeHash() })
+    expect(addSpy).toHaveBeenLastCalledWith({
+      ...makeFakeAccountData(),
+      password: makeFakeHashedPassword()
+    })
   })
   test('should throws if AddAccountRepository throws', async () => {
     const { sut, addAccountRepositoryStub } = makeSut()
     jest.spyOn(addAccountRepositoryStub, 'add').mockRejectedValue(new Error())
     const promise = sut.add(makeFakeAccountData())
     await expect(promise).rejects.toThrow()
+  })
+  test('should return an account on success', async () => {
+    const { sut } = makeSut()
+    const account = await sut.add(makeFakeAccountData())
+    expect(account).toEqual(makeFakeAccount())
   })
 })
