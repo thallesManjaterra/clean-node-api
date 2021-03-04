@@ -17,16 +17,19 @@ interface SutTypes {
   controllerStub: Controller
 }
 
-function makeSut (): SutTypes {
+function makeController (): Controller {
   class ControllerStub implements Controller {
     async handle (httpRequest: HttpRequest): Promise<HttpResponse> {
-      return await Promise.resolve({
-        statusCode: 200,
-        body: {}
-      })
+      return await Promise.resolve(
+        { statusCode: 200, body: {} }
+      )
     }
   }
-  const controllerStub = new ControllerStub()
+  return new ControllerStub()
+}
+
+function makeSut (): SutTypes {
+  const controllerStub = makeController()
   const sut = new LogControllerDecorator(controllerStub)
   return { sut, controllerStub }
 }
