@@ -7,10 +7,16 @@ export function adaptRoute (controller: Controller) {
       body: req.body
     }
     controller.handle(httpRequest)
-      .then((httpResponse: HttpResponse) => {
+      .then(({ statusCode, body }: HttpResponse) => {
         res
-          .status(httpResponse.statusCode)
-          .json(httpResponse.body)
+          .status(statusCode)
+          .json(statusCode === 200
+            ? body
+            : errorMessage()
+          )
+        function errorMessage (): { error: string } {
+          return { error: body.message }
+        }
       })
       .catch(console.error)
   }
