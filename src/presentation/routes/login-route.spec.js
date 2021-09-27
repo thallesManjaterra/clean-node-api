@@ -21,4 +21,14 @@ describe('Login Route', () => {
     const httpResponse = sut.route(httpRequest)
     expect(httpResponse.statusCode).toBe(400)
   })
+  test('should return 500 when httpRequest is not provided ', () => {
+    const sut = new LoginRoute()
+    const httpResponse = sut.route()
+    expect(httpResponse.statusCode).toBe(500)
+  })
+  test('should return 500 when httpRequest hasn\'t body', () => {
+    const sut = new LoginRoute()
+    const httpResponse = sut.route({})
+    expect(httpResponse.statusCode).toBe(500)
+  })
 })
