@@ -2,7 +2,7 @@ const MissingParamError = require('../errors/missing-param-error')
 const HttpResponse = require('../helpers/http-reponse')
 
 class LoginRoute {
-  route (httpRequest) {
+  handle (httpRequest) {
     if (!httpRequest?.body) {
       return HttpResponse.serverError()
     }
