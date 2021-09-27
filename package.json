@@ -17,6 +17,11 @@
     "url": "https://github.com/thallesManjaterra/clean-node-api/issues"
   },
   "homepage": "https://github.com/thallesManjaterra/clean-node-api#readme",
+  "standard": {
+    "env": [
+      "jest"
+    ]
+  },
   "devDependencies": {
     "husky": "^4.3.8",
     "jest": "^27.2.2",
