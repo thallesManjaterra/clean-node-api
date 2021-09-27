@@ -17,7 +17,19 @@
     "url": "https://github.com/thallesManjaterra/clean-node-api/issues"
   },
   "homepage": "https://github.com/thallesManjaterra/clean-node-api#readme",
+  "lint-staged": {
+    "*.js": [
+      "standard --fix"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
   "devDependencies": {
+    "husky": "^4.3.8",
+    "lint-staged": "^9.5.0",
     "standard": "^16.0.3"
   }
 }
