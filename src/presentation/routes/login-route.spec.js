@@ -59,7 +59,7 @@ describe('Login Route', () => {
     expect(httpResponse).toEqual(HttpResponse.unauthorized())
   })
   test('should return 500 when AuthUseCase is not provided', async () => {
-    const sut = new LoginRoute()
+    const sut = new LoginRoute(null, makeEmailValidatorMock())
     const httpRequest = {
       body: {
         email: 'any_email@mail.com',
@@ -70,7 +70,7 @@ describe('Login Route', () => {
     expect(httpResponse).toEqual(HttpResponse.serverError())
   })
   test('should return 500 when AuthUseCase.auth is not provided', async () => {
-    const sut = new LoginRoute({})
+    const sut = new LoginRoute({}, makeEmailValidatorMock())
     const httpRequest = {
       body: {
         email: 'any_email@mail.com',
@@ -103,6 +103,28 @@ describe('Login Route', () => {
     }
     const httpResponse = await sut.handle(httpRequest)
     expect(httpResponse).toEqual(HttpResponse.badRequest(new InvalidParamError('email')))
+  })
+  test('should return 500 when EmailValidator is not provided', async () => {
+    const sut = new LoginRoute(makeAuthUseCaseMock())
+    const httpRequest = {
+      body: {
+        email: 'any_email@mail.com',
+        password: 'any_password'
+      }
+    }
+    const httpResponse = await sut.handle(httpRequest)
+    expect(httpResponse).toEqual(HttpResponse.serverError())
+  })
+  test('should return 500 when EmailValidator.isValid is not provided', async () => {
+    const sut = new LoginRoute(makeAuthUseCaseMock(), {})
+    const httpRequest = {
+      body: {
+        email: 'any_email@mail.com',
+        password: 'any_password'
+      }
+    }
+    const httpResponse = await sut.handle(httpRequest)
+    expect(httpResponse).toEqual(HttpResponse.serverError())
   })
   test('should return 200 when AuthUseCase.auth returns an access token', async () => {
     const { sut } = makeSut()
