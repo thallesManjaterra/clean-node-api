@@ -54,7 +54,7 @@ describe('Login Route', () => {
       }
     }
     const httpResponse = sut.handle(httpRequest)
-    expect(httpResponse.statusCode).toBe(401)
+    expect(httpResponse).toEqual(HttpResponse.unauthorized())
   })
 })
 

@@ -18,9 +18,7 @@ class LoginRoute {
       return HttpResponse.badRequest(new MissingParamError('password'))
     }
     this.authUseCase.auth(email, password)
-    return {
-      statusCode: 401
-    }
+    return HttpResponse.unauthorized()
   }
 }
 

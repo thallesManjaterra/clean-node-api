@@ -1,3 +1,5 @@
+const UnauthorizedError = require('../errors/unauthorized-error')
+
 class HttpResponse {
   static badRequest (error) {
     return {
@@ -9,6 +11,13 @@ class HttpResponse {
   static serverError () {
     return {
       statusCode: 500
+    }
+  }
+
+  static unauthorized () {
+    return {
+      statusCode: 401,
+      body: new UnauthorizedError()
     }
   }
 }
