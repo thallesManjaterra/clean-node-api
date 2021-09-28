@@ -34,6 +34,7 @@ describe('Login Route', () => {
     const httpResponse = await sut.handle({})
     expect(httpResponse.statusCode).toBe(500)
   })
+
   test('should call AuthUseCase.auth with correct values', async () => {
     const { sut, authUseCaseMock } = makeSut()
     const httpRequest = {
@@ -94,6 +95,7 @@ describe('Login Route', () => {
     const httpResponse = await sut.handle(httpRequest)
     expect(httpResponse).toEqual(HttpResponse.serverError())
   })
+
   test('should return 400 when EmailValidator.isValid returns false', async () => {
     const { sut, emailValidatorMock } = makeSut()
     emailValidatorMock.isValid.mockReturnValueOnce(false)
@@ -153,6 +155,7 @@ describe('Login Route', () => {
     await sut.handle(httpRequest)
     expect(emailValidatorMock.isValid).toHaveBeenCalledWith(httpRequest.body.email)
   })
+
   test('should return 200 when AuthUseCase.auth returns an access token', async () => {
     const { sut } = makeSut()
     const httpRequest = {
