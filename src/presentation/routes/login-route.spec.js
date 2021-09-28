@@ -82,7 +82,9 @@ describe('Login Route', () => {
   })
   test('should return 500 when AuthUseCase.auth throws', async () => {
     const { sut, authUseCaseMock } = makeSut()
-    authUseCaseMock.auth.mockRejectedValueOnce(new Error())
+    authUseCaseMock.auth.mockImplementationOnce(async () => {
+      throw new Error()
+    })
     const httpRequest = {
       body: {
         email: 'valid_email@mail.com',
@@ -125,6 +127,31 @@ describe('Login Route', () => {
     }
     const httpResponse = await sut.handle(httpRequest)
     expect(httpResponse).toEqual(HttpResponse.serverError())
+  })
+  test('should return 500 when EmailValidator.isValid throws', async () => {
+    const { sut, emailValidatorMock } = makeSut()
+    emailValidatorMock.isValid.mockImplementationOnce(() => {
+      throw new Error()
+    })
+    const httpRequest = {
+      body: {
+        email: 'valid_email@mail.com',
+        password: 'valid_password'
+      }
+    }
+    const httpResponse = await sut.handle(httpRequest)
+    expect(httpResponse).toEqual(HttpResponse.serverError())
+  })
+  test('should call EmailValidator.isValid with correct value', async () => {
+    const { sut, emailValidatorMock } = makeSut()
+    const httpRequest = {
+      body: {
+        email: 'valid_email@mail.com',
+        password: 'valid_password'
+      }
+    }
+    await sut.handle(httpRequest)
+    expect(emailValidatorMock.isValid).toHaveBeenCalledWith(httpRequest.body.email)
   })
   test('should return 200 when AuthUseCase.auth returns an access token', async () => {
     const { sut } = makeSut()
