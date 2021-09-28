@@ -4,10 +4,11 @@
   "description": "Construindo API REST em NodeJS utilizando TDD, Clean Architecture e Design Patterns",
   "main": "index.js",
   "scripts": {
-    "test": "jest",
-    "test:watch": "jest --watch --noStackTrace --silent",
-    "test:staged": "jest --bail --findRelatedTests",
-    "test:ci": "jest --coverage"
+    "test": "jest --noStackTrace --silent",
+    "test:unit": "npm test -- -c jest-unit-config.js --watch",
+    "test:integration": "npm test -- -c jest-integration-config.js --watch",
+    "test:staged": "npm test -- --bail --findRelatedTests",
+    "test:ci": "npm test -- --coverage"
   },
   "repository": {
     "type": "git",
