@@ -7,21 +7,22 @@ class LoginRoute {
   }
 
   handle (httpRequest) {
-    if (!httpRequest?.body || !this.authUseCase?.auth) {
+    try {
+      const { email, password } = httpRequest.body
+      if (!email) {
+        return HttpResponse.badRequest(new MissingParamError('email'))
+      }
+      if (!password) {
+        return HttpResponse.badRequest(new MissingParamError('password'))
+      }
+      const accessToken = this.authUseCase.auth(email, password)
+      if (!accessToken) {
+        return HttpResponse.unauthorized()
+      }
+      return HttpResponse.ok({ token: accessToken })
+    } catch (error) {
       return HttpResponse.serverError()
     }
-    const { email, password } = httpRequest.body
-    if (!email) {
-      return HttpResponse.badRequest(new MissingParamError('email'))
-    }
-    if (!password) {
-      return HttpResponse.badRequest(new MissingParamError('password'))
-    }
-    const accessToken = this.authUseCase.auth(email, password)
-    if (!accessToken) {
-      return HttpResponse.unauthorized()
-    }
-    return HttpResponse.ok({ token: accessToken })
   }
 }
 

@@ -79,6 +79,20 @@ describe('Login Route', () => {
     const httpResponse = sut.handle(httpRequest)
     expect(httpResponse).toEqual(HttpResponse.serverError())
   })
+  test('should return 500 when AuthUseCase.auth throws', () => {
+    const { sut, authUseCaseMock } = makeSut()
+    authUseCaseMock.auth.mockImplementationOnce(() => {
+      throw new Error()
+    })
+    const httpRequest = {
+      body: {
+        email: 'valid_email@mail.com',
+        password: 'valid_password'
+      }
+    }
+    const httpResponse = sut.handle(httpRequest)
+    expect(httpResponse).toEqual(HttpResponse.serverError())
+  })
   test('should return 200 when AuthUseCase returns an access token', () => {
     const { sut } = makeSut()
     const httpRequest = {
@@ -93,13 +107,17 @@ describe('Login Route', () => {
 })
 
 function makeSut () {
-  const authUseCaseMock = {
-    auth: jest.fn().mockReturnValue(makeFakeToken())
-  }
+  const authUseCaseMock = makeAuthUseCaseMock()
   const sut = new LoginRoute(authUseCaseMock)
   return {
     authUseCaseMock,
     sut
+  }
+}
+
+function makeAuthUseCaseMock () {
+  return {
+    auth: jest.fn(() => makeFakeToken())
   }
 }
 
