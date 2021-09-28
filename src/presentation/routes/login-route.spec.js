@@ -1,5 +1,6 @@
 const LoginRoute = require('./login-route')
 const MissingParamError = require('../errors/missing-param-error')
+const InvalidParamError = require('../errors/invalid-param-error')
 const HttpResponse = require('../helpers/http-reponse')
 
 describe('Login Route', () => {
@@ -33,7 +34,7 @@ describe('Login Route', () => {
     const httpResponse = await sut.handle({})
     expect(httpResponse.statusCode).toBe(500)
   })
-  test('should call AuthUseCase with correct values', async () => {
+  test('should call AuthUseCase.auth with correct values', async () => {
     const { sut, authUseCaseMock } = makeSut()
     const httpRequest = {
       body: {
@@ -45,7 +46,7 @@ describe('Login Route', () => {
     await sut.handle(httpRequest)
     expect(authUseCaseMock.auth).toHaveBeenCalledWith(email, password)
   })
-  test('should return 401 when AuthUseCase returns null', async () => {
+  test('should return 401 when AuthUseCase.auth returns null', async () => {
     const { sut, authUseCaseMock } = makeSut()
     authUseCaseMock.auth.mockResolvedValueOnce(null)
     const httpRequest = {
@@ -91,7 +92,19 @@ describe('Login Route', () => {
     const httpResponse = await sut.handle(httpRequest)
     expect(httpResponse).toEqual(HttpResponse.serverError())
   })
-  test('should return 200 when AuthUseCase returns an access token', async () => {
+  test('should return 400 when EmailValidator.isValid returns false', async () => {
+    const { sut, emailValidatorMock } = makeSut()
+    emailValidatorMock.isValid.mockReturnValueOnce(false)
+    const httpRequest = {
+      body: {
+        email: 'invalid_email@mail.com',
+        password: 'valid_password'
+      }
+    }
+    const httpResponse = await sut.handle(httpRequest)
+    expect(httpResponse).toEqual(HttpResponse.badRequest(new InvalidParamError('email')))
+  })
+  test('should return 200 when AuthUseCase.auth returns an access token', async () => {
     const { sut } = makeSut()
     const httpRequest = {
       body: {
@@ -106,16 +119,24 @@ describe('Login Route', () => {
 
 function makeSut () {
   const authUseCaseMock = makeAuthUseCaseMock()
-  const sut = new LoginRoute(authUseCaseMock)
+  const emailValidatorMock = makeEmailValidatorMock()
+  const sut = new LoginRoute(authUseCaseMock, emailValidatorMock)
   return {
     authUseCaseMock,
+    emailValidatorMock,
     sut
   }
 }
 
 function makeAuthUseCaseMock () {
   return {
-    auth: jest.fn().mockResolvedValue(makeFakeToken())
+    auth: jest.fn(async () => Promise.resolve(makeFakeToken()))
+  }
+}
+
+function makeEmailValidatorMock () {
+  return {
+    isValid: jest.fn(() => true)
   }
 }
 
