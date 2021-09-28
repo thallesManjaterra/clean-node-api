@@ -56,6 +56,28 @@ describe('Login Route', () => {
     const httpResponse = sut.handle(httpRequest)
     expect(httpResponse).toEqual(HttpResponse.unauthorized())
   })
+  test('should return 500 when AuthUseCase is not provided', () => {
+    const sut = new LoginRoute()
+    const httpRequest = {
+      body: {
+        email: 'any_email@mail.com',
+        password: 'any_password'
+      }
+    }
+    const httpResponse = sut.handle(httpRequest)
+    expect(httpResponse).toEqual(HttpResponse.serverError())
+  })
+  test('should return 500 when AuthUseCase.auth is not provided', () => {
+    const sut = new LoginRoute({})
+    const httpRequest = {
+      body: {
+        email: 'any_email@mail.com',
+        password: 'any_password'
+      }
+    }
+    const httpResponse = sut.handle(httpRequest)
+    expect(httpResponse).toEqual(HttpResponse.serverError())
+  })
 })
 
 function makeSut () {
