@@ -6,7 +6,8 @@
   "scripts": {
     "test": "jest",
     "test:watch": "jest --watch --noStackTrace --silent",
-    "test:staged": "jest --bail --findRelatedTests"
+    "test:staged": "jest --bail --findRelatedTests",
+    "test:ci": "jest --coverage"
   },
   "repository": {
     "type": "git",
