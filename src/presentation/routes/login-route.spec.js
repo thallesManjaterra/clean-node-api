@@ -34,23 +34,24 @@ describe('Login Route', () => {
     expect(httpResponse.statusCode).toBe(500)
   })
   test('should call AuthUseCase with correct values', () => {
-    const { sut, authUseCase } = makeSut()
+    const { sut, authUseCaseMock } = makeSut()
     const httpRequest = {
       body: {
         email: 'any_email@mail.com',
         password: 'any_password'
       }
     }
+    const { email, password } = httpRequest.body
     sut.handle(httpRequest)
-    expect(authUseCase.email).toBe(httpRequest.body.email)
-    expect(authUseCase.password).toBe(httpRequest.body.password)
+    expect(authUseCaseMock.auth).toHaveBeenCalledWith(email, password)
   })
-  test('should return 401 when invalid credentials are provided', () => {
-    const { sut } = makeSut()
+  test('should return 401 when AuthUseCase returns null', () => {
+    const { sut, authUseCaseMock } = makeSut()
+    authUseCaseMock.auth.mockReturnValueOnce(null)
     const httpRequest = {
       body: {
-        email: 'any_email@mail.com',
-        password: 'any_password'
+        email: 'invalid_email@mail.com',
+        password: 'invalid_password'
       }
     }
     const httpResponse = sut.handle(httpRequest)
@@ -78,19 +79,26 @@ describe('Login Route', () => {
     const httpResponse = sut.handle(httpRequest)
     expect(httpResponse).toEqual(HttpResponse.serverError())
   })
+  test('should return 200 when AuthUseCase returns an access token', () => {
+    const { sut } = makeSut()
+    const httpRequest = {
+      body: {
+        email: 'valid_email@mail.com',
+        password: 'valid_password'
+      }
+    }
+    const httpResponse = sut.handle(httpRequest)
+    expect(httpResponse).toEqual(HttpResponse.ok())
+  })
 })
 
 function makeSut () {
-  class AuthUseCase {
-    auth (email, password) {
-      this.email = email
-      this.password = password
-    }
+  const authUseCaseMock = {
+    auth: jest.fn().mockReturnValue('any_token')
   }
-  const authUseCase = new AuthUseCase()
-  const sut = new LoginRoute(authUseCase)
+  const sut = new LoginRoute(authUseCaseMock)
   return {
-    authUseCase,
+    authUseCaseMock,
     sut
   }
 }
