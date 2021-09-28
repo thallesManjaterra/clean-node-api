@@ -88,17 +88,21 @@ describe('Login Route', () => {
       }
     }
     const httpResponse = sut.handle(httpRequest)
-    expect(httpResponse).toEqual(HttpResponse.ok())
+    expect(httpResponse).toEqual(HttpResponse.ok({ token: makeFakeToken() }))
   })
 })
 
 function makeSut () {
   const authUseCaseMock = {
-    auth: jest.fn().mockReturnValue('any_token')
+    auth: jest.fn().mockReturnValue(makeFakeToken())
   }
   const sut = new LoginRoute(authUseCaseMock)
   return {
     authUseCaseMock,
     sut
   }
+}
+
+function makeFakeToken () {
+  return 'any_token'
 }

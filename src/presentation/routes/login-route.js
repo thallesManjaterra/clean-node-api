@@ -21,7 +21,7 @@ class LoginRoute {
     if (!accessToken) {
       return HttpResponse.unauthorized()
     }
-    return HttpResponse.ok()
+    return HttpResponse.ok({ token: accessToken })
   }
 }
 
