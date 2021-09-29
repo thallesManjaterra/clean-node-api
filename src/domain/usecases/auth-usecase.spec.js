@@ -25,6 +25,12 @@ describe('Auth Usecase', () => {
     const authPromise = sut.auth('any_email@mail.com', 'any_password')
     expect(authPromise).rejects.toThrow(new InvalidParamError('loadUserByEmailRepository'))
   })
+  test('should return null if LoadUserByEmailRepository returns null', async () => {
+    const { sut, loadUserByEmailRepositoryMock } = makeSut()
+    loadUserByEmailRepositoryMock.load.mockResolvedValueOnce(null)
+    const accessToken = await sut.auth('invalid_email@mail.com', 'any_password')
+    expect(accessToken).toBeNull()
+  })
 })
 
 function makeSut () {
