@@ -36,6 +36,12 @@ describe('Auth Usecase', () => {
     await sut.auth('valid_email@mail.com', 'any_password')
     expect(encrypterMock.compare).toHaveBeenCalledWith('any_password', makeFakeHashedPassword())
   })
+  test('should return null if Encrypter returns false', async () => {
+    const { sut, encrypterMock } = makeSut()
+    encrypterMock.compare.mockReturnValueOnce(false)
+    const accessToken = await sut.auth('valid_email@mail.com', 'invalid_password')
+    expect(accessToken).toBeNull()
+  })
 })
 
 function makeSut () {
@@ -61,6 +67,6 @@ function makeFakeHashedPassword () {
 
 function makeEncrypter () {
   return {
-    compare: jest.fn()
+    compare: jest.fn(() => true)
   }
 }

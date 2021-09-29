@@ -23,7 +23,10 @@ class AuthUseCase {
     if (!user) {
       return null
     }
-    this.encrypter.compare(password, user.password)
+    const passwordIsValid = this.encrypter.compare(password, user.password)
+    if (!passwordIsValid) {
+      return null
+    }
   }
 }
 
