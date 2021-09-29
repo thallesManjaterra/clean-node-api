@@ -47,6 +47,11 @@ describe('Auth Usecase', () => {
     await sut.auth('valid_email@mail.com', 'valid_password')
     expect(tokenGeneratorMock.generate).toHaveBeenCalledWith(makeFakeId())
   })
+  test('should return an access token if valid credentials are provided', async () => {
+    const { sut } = makeSut()
+    const accessToken = await sut.auth('valid_email@mail.com', 'valid_password')
+    expect(accessToken).toBe(makeFakeToken())
+  })
 })
 
 function makeSut () {
@@ -84,6 +89,10 @@ function makeEncrypter () {
 
 function makeTokenGenerator () {
   return {
-    generate: jest.fn()
+    generate: jest.fn(() => makeFakeToken())
   }
+}
+
+function makeFakeToken () {
+  return 'any_token'
 }

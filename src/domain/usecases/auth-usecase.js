@@ -28,7 +28,8 @@ class AuthUseCase {
     if (!passwordIsValid) {
       return null
     }
-    this.tokenGenerator.generate(user.id)
+    const accessToken = this.tokenGenerator.generate(user.id)
+    return accessToken
   }
 }
 
