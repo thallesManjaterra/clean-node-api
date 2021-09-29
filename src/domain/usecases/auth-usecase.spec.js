@@ -1,5 +1,5 @@
 const AuthUseCase = require('./auth-usecase')
-const { MissingParamError, InvalidParamError } = require('../../utils/errors')
+const { MissingParamError } = require('../../utils/errors')
 
 describe('Auth Usecase', () => {
   test('should throw if no email is provided', async () => {
@@ -10,6 +10,11 @@ describe('Auth Usecase', () => {
     const { sut } = makeSut()
     expect(sut.auth('any_email@mail.com')).rejects.toThrow(new MissingParamError('password'))
   })
+  test('should throw if no dependency is provided', async () => {
+    const sut = new AuthUseCase()
+    expect(sut.auth('any_email@mail.com', 'any_password')).rejects.toThrow()
+  })
+
   test('should call LoadUserByEmailRepository with correct email', async () => {
     const { sut, loadUserByEmailRepositoryMock } = makeSut()
     await sut.auth('any_email@mail.com', 'any_password')
@@ -18,12 +23,12 @@ describe('Auth Usecase', () => {
   test('should throw if LoadUserByEmailRepository is not provided', async () => {
     const sut = new AuthUseCase({})
     const authPromise = sut.auth('any_email@mail.com', 'any_password')
-    expect(authPromise).rejects.toThrow(new MissingParamError('loadUserByEmailRepository'))
+    expect(authPromise).rejects.toThrow()
   })
   test('should throw if LoadUserByEmailRepository.load is not provided', async () => {
     const sut = new AuthUseCase({ loadUserByEmailRepository: {} })
     const authPromise = sut.auth('any_email@mail.com', 'any_password')
-    expect(authPromise).rejects.toThrow(new InvalidParamError('loadUserByEmailRepository'))
+    expect(authPromise).rejects.toThrow()
   })
   test('should return null if LoadUserByEmailRepository returns null', async () => {
     const { sut, loadUserByEmailRepositoryMock } = makeSut()
@@ -31,6 +36,7 @@ describe('Auth Usecase', () => {
     const accessToken = await sut.auth('invalid_email@mail.com', 'any_password')
     expect(accessToken).toBeNull()
   })
+
   test('should call Encrypter with correct values', async () => {
     const { sut, encrypterMock } = makeSut()
     await sut.auth('valid_email@mail.com', 'any_password')
@@ -42,11 +48,13 @@ describe('Auth Usecase', () => {
     const accessToken = await sut.auth('valid_email@mail.com', 'invalid_password')
     expect(accessToken).toBeNull()
   })
+
   test('should call TokenGenerator with correct value', async () => {
     const { sut, tokenGeneratorMock } = makeSut()
     await sut.auth('valid_email@mail.com', 'valid_password')
     expect(tokenGeneratorMock.generate).toHaveBeenCalledWith(makeFakeId())
   })
+
   test('should return an access token if valid credentials are provided', async () => {
     const { sut } = makeSut()
     const accessToken = await sut.auth('valid_email@mail.com', 'valid_password')
