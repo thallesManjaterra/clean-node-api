@@ -42,23 +42,34 @@ describe('Auth Usecase', () => {
     const accessToken = await sut.auth('valid_email@mail.com', 'invalid_password')
     expect(accessToken).toBeNull()
   })
+  test('should call TokenGenerator with correct value', async () => {
+    const { sut, tokenGeneratorMock } = makeSut()
+    await sut.auth('valid_email@mail.com', 'valid_password')
+    expect(tokenGeneratorMock.generate).toHaveBeenCalledWith(makeFakeId())
+  })
 })
 
 function makeSut () {
-  const encrypterMock = makeEncrypter()
   const loadUserByEmailRepositoryMock = makeLoadUserByEmailRepository()
-  const sut = new AuthUseCase(loadUserByEmailRepositoryMock, encrypterMock)
+  const encrypterMock = makeEncrypter()
+  const tokenGeneratorMock = makeTokenGenerator()
+  const sut = new AuthUseCase(loadUserByEmailRepositoryMock, encrypterMock, tokenGeneratorMock)
   return {
-    sut, loadUserByEmailRepositoryMock, encrypterMock
+    sut, loadUserByEmailRepositoryMock, encrypterMock, tokenGeneratorMock
   }
 }
 
 function makeLoadUserByEmailRepository () {
   return {
     load: jest.fn(async () => Promise.resolve({
+      id: makeFakeId(),
       password: makeFakeHashedPassword()
     }))
   }
+}
+
+function makeFakeId () {
+  return 'any_id'
 }
 
 function makeFakeHashedPassword () {
@@ -68,5 +79,11 @@ function makeFakeHashedPassword () {
 function makeEncrypter () {
   return {
     compare: jest.fn(() => true)
+  }
+}
+
+function makeTokenGenerator () {
+  return {
+    generate: jest.fn()
   }
 }
