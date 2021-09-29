@@ -31,18 +31,36 @@ describe('Auth Usecase', () => {
     const accessToken = await sut.auth('invalid_email@mail.com', 'any_password')
     expect(accessToken).toBeNull()
   })
+  test('should call Encrypter with correct values', async () => {
+    const { sut, encrypterMock } = makeSut()
+    await sut.auth('valid_email@mail.com', 'any_password')
+    expect(encrypterMock.compare).toHaveBeenCalledWith('any_password', makeFakeHashedPassword())
+  })
 })
 
 function makeSut () {
+  const encrypterMock = makeEncrypter()
   const loadUserByEmailRepositoryMock = makeLoadUserByEmailRepository()
-  const sut = new AuthUseCase(loadUserByEmailRepositoryMock)
+  const sut = new AuthUseCase(loadUserByEmailRepositoryMock, encrypterMock)
   return {
-    sut, loadUserByEmailRepositoryMock
+    sut, loadUserByEmailRepositoryMock, encrypterMock
   }
 }
 
 function makeLoadUserByEmailRepository () {
   return {
-    load: jest.fn(async () => {})
+    load: jest.fn(async () => Promise.resolve({
+      password: makeFakeHashedPassword()
+    }))
+  }
+}
+
+function makeFakeHashedPassword () {
+  return 'hashed_password'
+}
+
+function makeEncrypter () {
+  return {
+    compare: jest.fn()
   }
 }
