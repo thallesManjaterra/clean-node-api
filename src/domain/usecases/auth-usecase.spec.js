@@ -16,12 +16,12 @@ describe('Auth Usecase', () => {
     expect(loadUserByEmailRepositoryMock.load).toHaveBeenCalledWith('any_email@mail.com')
   })
   test('should throw if LoadUserByEmailRepository is not provided', async () => {
-    const sut = new AuthUseCase()
+    const sut = new AuthUseCase({})
     const authPromise = sut.auth('any_email@mail.com', 'any_password')
     expect(authPromise).rejects.toThrow(new MissingParamError('loadUserByEmailRepository'))
   })
   test('should throw if LoadUserByEmailRepository.load is not provided', async () => {
-    const sut = new AuthUseCase({})
+    const sut = new AuthUseCase({ loadUserByEmailRepository: {} })
     const authPromise = sut.auth('any_email@mail.com', 'any_password')
     expect(authPromise).rejects.toThrow(new InvalidParamError('loadUserByEmailRepository'))
   })
@@ -58,7 +58,11 @@ function makeSut () {
   const loadUserByEmailRepositoryMock = makeLoadUserByEmailRepository()
   const encrypterMock = makeEncrypter()
   const tokenGeneratorMock = makeTokenGenerator()
-  const sut = new AuthUseCase(loadUserByEmailRepositoryMock, encrypterMock, tokenGeneratorMock)
+  const sut = new AuthUseCase({
+    loadUserByEmailRepository: loadUserByEmailRepositoryMock,
+    encrypter: encrypterMock,
+    tokenGenerator: tokenGeneratorMock
+  })
   return {
     sut, loadUserByEmailRepositoryMock, encrypterMock, tokenGeneratorMock
   }
