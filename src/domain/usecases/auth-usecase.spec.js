@@ -10,25 +10,11 @@ describe('Auth Usecase', () => {
     const { sut } = makeSut()
     expect(sut.auth('any_email@mail.com')).rejects.toThrow(new MissingParamError('password'))
   })
-  test('should throw if no dependency is provided', async () => {
-    const sut = new AuthUseCase()
-    expect(sut.auth('any_email@mail.com', 'any_password')).rejects.toThrow()
-  })
 
   test('should call LoadUserByEmailRepository with correct email', async () => {
     const { sut, loadUserByEmailRepositoryMock } = makeSut()
     await sut.auth('any_email@mail.com', 'any_password')
     expect(loadUserByEmailRepositoryMock.load).toHaveBeenCalledWith('any_email@mail.com')
-  })
-  test('should throw if LoadUserByEmailRepository is not provided', async () => {
-    const sut = new AuthUseCase({})
-    const authPromise = sut.auth('any_email@mail.com', 'any_password')
-    expect(authPromise).rejects.toThrow()
-  })
-  test('should throw if LoadUserByEmailRepository.load is not provided', async () => {
-    const sut = new AuthUseCase({ loadUserByEmailRepository: {} })
-    const authPromise = sut.auth('any_email@mail.com', 'any_password')
-    expect(authPromise).rejects.toThrow()
   })
   test('should return null if LoadUserByEmailRepository returns null', async () => {
     const { sut, loadUserByEmailRepositoryMock } = makeSut()
@@ -59,6 +45,53 @@ describe('Auth Usecase', () => {
     const { sut } = makeSut()
     const accessToken = await sut.auth('valid_email@mail.com', 'valid_password')
     expect(accessToken).toBe(makeFakeToken())
+  })
+
+  test('should throw if invalid dependencies are provided', async () => {
+    const invalid = {}
+    const loadUserByEmailRepository = makeLoadUserByEmailRepository()
+    const encrypter = makeEncrypter()
+    const suts = [
+      new AuthUseCase(),
+      new AuthUseCase({}),
+      new AuthUseCase({
+        loadUserByEmailRepository: invalid
+      }),
+      new AuthUseCase({
+        loadUserByEmailRepository
+      }),
+      new AuthUseCase({
+        loadUserByEmailRepository,
+        encrypter: invalid
+      }),
+      new AuthUseCase({
+        loadUserByEmailRepository,
+        encrypter
+      }),
+      new AuthUseCase({
+        loadUserByEmailRepository,
+        encrypter,
+        tokenGenerator: invalid
+      })
+    ]
+    for (const sut of suts) {
+      await expect(sut.auth('any_email@mail.com', 'any_password')).rejects.toThrow()
+    }
+  })
+
+  test('should throw if any dependency throws', async () => {
+    const dependencies = [
+      ['loadUserByEmailRepositoryMock', 'load'],
+      ['encrypterMock', 'compare'],
+      ['tokenGeneratorMock', 'generate']
+    ]
+    const instance = 0
+    const method = 1
+    for (const dependency of dependencies) {
+      const suts = makeSut()
+      suts[dependency[instance]][dependency[method]].mockImplementationOnce(() => { throw new Error() })
+      await expect(suts.sut.auth('any_email@mail.com', 'any_password')).rejects.toThrow()
+    }
   })
 })
 
