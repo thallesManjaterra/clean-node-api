@@ -13,4 +13,9 @@ describe('Encrypter', () => {
     const isValuesMatch = await sut.compare('any_value', 'hashed_of_another_value')
     expect(isValuesMatch).toBe(false)
   })
+  test('should call bcrypt.compare with correct values', async () => {
+    const sut = new Encrypter()
+    await sut.compare('any_value', 'hashed_value')
+    expect(bcrypt.compare).toHaveBeenCalledWith('any_value', 'hashed_of_another_value')
+  })
 })
