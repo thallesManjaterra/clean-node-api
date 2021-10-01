@@ -67,6 +67,7 @@ describe('Auth Usecase', () => {
     const invalid = {}
     const loadUserByEmailRepository = makeLoadUserByEmailRepository()
     const encrypter = makeEncrypter()
+    const tokenGenerator = makeTokenGenerator()
     const suts = [
       new AuthUseCase(),
       new AuthUseCase({}),
@@ -88,6 +89,17 @@ describe('Auth Usecase', () => {
         loadUserByEmailRepository,
         encrypter,
         tokenGenerator: invalid
+      }),
+      new AuthUseCase({
+        loadUserByEmailRepository,
+        encrypter,
+        tokenGenerator
+      }),
+      new AuthUseCase({
+        loadUserByEmailRepository,
+        encrypter,
+        tokenGenerator,
+        updateAccessTokenRepository: invalid
       })
     ]
     for (const sut of suts) {
@@ -101,17 +113,16 @@ describe('Auth Usecase', () => {
     const dependencies = [
       ['loadUserByEmailRepositoryMock', 'load'],
       ['encrypterMock', 'compare'],
-      ['tokenGeneratorMock', 'generate']
+      ['tokenGeneratorMock', 'generate'],
+      ['updateAccessTokenRepositoryMock', 'update']
     ]
     const instance = 0
     const method = 1
     for (const dependency of dependencies) {
       const suts = makeSut()
-      suts[dependency[instance]][dependency[method]].mockImplementationOnce(
-        () => {
-          throw new Error()
-        }
-      )
+      suts[dependency[instance]][dependency[method]].mockImplementationOnce(() => {
+        throw new Error()
+      })
       await expect(
         suts.sut.auth('any_email@mail.com', 'any_password')
       ).rejects.toThrow()
