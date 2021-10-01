@@ -187,6 +187,6 @@ function makeFakeToken () {
 
 function makeUpdateAccessTokenRepository () {
   return {
-    update: jest.fn()
+    update: jest.fn(async () => Promise.resolve())
   }
 }
