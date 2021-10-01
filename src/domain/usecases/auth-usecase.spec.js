@@ -171,7 +171,7 @@ function makeFakeHashedPassword () {
 
 function makeEncrypter () {
   return {
-    compare: jest.fn(() => true)
+    compare: jest.fn(async () => Promise.resolve(true))
   }
 }
 

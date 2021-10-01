@@ -1,6 +1,8 @@
+const bcrypt = require('bcrypt')
+
 class Encrypter {
-  compare (value, hashedValue) {
-    return true
+  compare (value, hash) {
+    return bcrypt.compare(value, hash)
   }
 }
 

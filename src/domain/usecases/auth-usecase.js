@@ -16,7 +16,7 @@ class AuthUseCase {
       throw new MissingParamError('password')
     }
     const user = await this.loadUserByEmailRepository.load(email)
-    const thereIsTheUserAndPasswordIsValid = user && this.encrypter.compare(password, user.password)
+    const thereIsTheUserAndPasswordIsValid = user && await this.encrypter.compare(password, user.password)
     if (thereIsTheUserAndPasswordIsValid) {
       const accessToken = this.tokenGenerator.generate(user.id)
       await this.updateAccessTokenRepository.update(user.id, accessToken)
