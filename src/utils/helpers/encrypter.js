@@ -9,7 +9,8 @@ class Encrypter {
     if (!hash) {
       throw new MissingParamError('hash')
     }
-    return bcrypt.compare(value, hash)
+    const isValueAndHashMatches = await bcrypt.compare(value, hash)
+    return isValueAndHashMatches
   }
 }
 
