@@ -1,6 +1,9 @@
+const jwt = require('jsonwebtoken')
+
 class TokenGenerator {
-  generate () {
-    return null
+  generate (id) {
+    const token = jwt.sign(id, 'secret_key')
+    return token
   }
 }
 
