@@ -25,6 +25,10 @@ describe('Token Generator', () => {
     const sut = new TokenGenerator()
     expect(() => { sut.generate('any_id') }).toThrow(new MissingParamError('secretKey'))
   })
+  test('should throw if no id is provided', () => {
+    const sut = makeSut()
+    expect(() => { sut.generate() }).toThrow(new MissingParamError('id'))
+  })
 })
 
 function makeSut () {

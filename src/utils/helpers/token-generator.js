@@ -10,6 +10,9 @@ class TokenGenerator {
     if (!this.secretKey) {
       throw new MissingParamError('secretKey')
     }
+    if (!id) {
+      throw new MissingParamError('id')
+    }
     const token = jwt.sign(id, this.secretKey)
     return token
   }
