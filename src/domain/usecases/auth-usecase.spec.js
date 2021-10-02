@@ -177,7 +177,7 @@ function makeEncrypter () {
 
 function makeTokenGenerator () {
   return {
-    generate: jest.fn(() => makeFakeToken())
+    generate: jest.fn(async () => Promise.resolve(makeFakeToken()))
   }
 }
 
