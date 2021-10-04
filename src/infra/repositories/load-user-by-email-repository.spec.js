@@ -8,7 +8,8 @@ describe('LoadUserByEmail Repository', () => {
   })
 
   beforeEach(async () => {
-    await MongoHelper.getCollection('users').deleteMany({})
+    const userModel = await MongoHelper.getCollection('users')
+    await userModel.deleteMany({})
   })
 
   afterAll(async () => {
@@ -16,12 +17,12 @@ describe('LoadUserByEmail Repository', () => {
   })
 
   test('should return null if no user is found', async () => {
-    const { sut } = makeSut()
+    const { sut } = await makeSut()
     const user = await sut.load('invalid_email@mail.com')
     expect(user).toBeNull()
   })
   test('should return a user if user is found', async () => {
-    const { sut, userModel } = makeSut()
+    const { sut, userModel } = await makeSut()
     const insertedFakeUser = await insertFakeUser(userModel)
     const user = await sut.load(makeFakeUser().email)
     expect(user).toEqual({
@@ -33,14 +34,14 @@ describe('LoadUserByEmail Repository', () => {
     const sut = new LoadUserByEmailRepository()
     await expect(sut.load(makeFakeUser().email)).rejects.toThrow()
   })
-  test('should throw if no userModel is provided', async () => {
-    const { sut } = makeSut()
+  test('should throw if no email is provided', async () => {
+    const { sut } = await makeSut()
     await expect(sut.load()).rejects.toThrow(new MissingParamError('email'))
   })
 })
 
-function makeSut () {
-  const userModel = MongoHelper.getCollection('users')
+async function makeSut () {
+  const userModel = await MongoHelper.getCollection('users')
   const sut = new LoadUserByEmailRepository(userModel)
   return { sut, userModel }
 }

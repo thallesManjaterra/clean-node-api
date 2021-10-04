@@ -4,28 +4,21 @@ module.exports = {
   async connect (uri, dbName) {
     this.dbName = dbName
     this.uri = uri
-    this.client = await MongoClient.connect(this.uri, {
+    this.client = await MongoClient.connect(uri, {
       useNewUrlParser: true,
       useUnifiedTopology: true
     })
-    this.db = this.client.db(this.dbName)
+    this.db = this.client.db(dbName)
   },
   async disconnect () {
-    this.client.close()
+    await this.client.close()
+    this.db = null
+    this.client = null
   },
-
-  isConnected () {
-    return this.client?.topology.isConnected()
-  },
-
-  getCollection (collectionName) {
-    return this.db.collection(collectionName)
-  },
-
-  async getDb () {
-    if (!this.isConnected()) {
-      await this.connect()
+  async getCollection (collectionName) {
+    if (!this.client?.topology.isConnected()) {
+      await this.connect(this.uri, this.dbName)
     }
-    return this.db
+    return this.db.collection(collectionName)
   }
 }
