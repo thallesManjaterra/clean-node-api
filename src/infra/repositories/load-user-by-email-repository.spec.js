@@ -21,13 +21,16 @@ describe('LoadUserByEmail Repository', () => {
   })
   test('should return a user if user is found', async () => {
     const { sut, userModel } = makeSut()
-    await userModel.insertOne(makeFakeUser())
-    const insertedFakeUser = await userModel.findOne({ _id: makeFakeUser()._id })
+    const insertedFakeUser = await insertFakeUser(userModel)
     const user = await sut.load(makeFakeUser().email)
     expect(user).toEqual({
       _id: insertedFakeUser._id,
       password: insertedFakeUser.password
     })
+  })
+  test('should throw if no userModel is provided', async () => {
+    const sut = new LoadUserByEmailRepository()
+    await expect(sut.load(makeFakeUser().email)).rejects.toThrow()
   })
 })
 
@@ -35,6 +38,12 @@ function makeSut () {
   const userModel = MongoHelper.getCollection('users')
   const sut = new LoadUserByEmailRepository(userModel)
   return { sut, userModel }
+}
+
+async function insertFakeUser (userModel) {
+  await userModel.insertOne(makeFakeUser())
+  const insertedFakeUser = await userModel.findOne({ _id: makeFakeUser()._id })
+  return insertedFakeUser
 }
 
 function makeFakeUser () {
