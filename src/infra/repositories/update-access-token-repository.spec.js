@@ -16,8 +16,7 @@ describe('UpdateAccessToken Repository', () => {
   })
 
   test('should update the user with the given access token', async () => {
-    const userModel = await MongoHelper.getCollection('users')
-    const sut = new UpdateAccessTokenRepository(userModel)
+    const { sut, userModel } = await makeSut()
     const fakeInsertedUser = await insertFakeUser(userModel)
     await sut.update(fakeInsertedUser._id, makeFakeToken())
     const fakeUser = await userModel.findOne({ _id: makeFakeUser()._id })
@@ -30,6 +29,12 @@ describe('UpdateAccessToken Repository', () => {
     await expect(sut.update(fakeInsertedUser._id, makeFakeToken())).rejects.toThrow()
   })
 })
+
+async function makeSut () {
+  const userModel = await MongoHelper.getCollection('users')
+  const sut = new UpdateAccessTokenRepository(userModel)
+  return { sut, userModel }
+}
 
 async function getFakeUser (userModel) {
   return await userModel.findOne()
