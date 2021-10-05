@@ -32,6 +32,38 @@ describe('Login Routes', () => {
       .send(fakeUserData)
       .expect(200)
   })
+  test('should return 401 when email provided is not found on database', async () => {
+    const fakeUser = makeFakeUser()
+    const fakeUserWithHashedPassword = {
+      ...fakeUser,
+      password: await bcrypt.hash(fakeUser.password, 10)
+    }
+    await insertFakeUser(fakeUserWithHashedPassword)
+    const fakeUserData = {
+      email: 'another_email@mail.com',
+      password: fakeUser.password
+    }
+    await request(app)
+      .post('/api/login')
+      .send(fakeUserData)
+      .expect(401)
+  })
+  test('should return 401 when an incorrect password is provided', async () => {
+    const fakeUser = makeFakeUser()
+    const fakeUserWithHashedPassword = {
+      ...fakeUser,
+      password: await bcrypt.hash(fakeUser.password, 10)
+    }
+    await insertFakeUser(fakeUserWithHashedPassword)
+    const fakeUserData = {
+      email: fakeUser.email,
+      password: 'incorrect_password'
+    }
+    await request(app)
+      .post('/api/login')
+      .send(fakeUserData)
+      .expect(401)
+  })
 })
 
 async function insertFakeUser (fakeUser) {
