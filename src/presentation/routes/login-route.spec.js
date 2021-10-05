@@ -59,7 +59,7 @@ describe('Login Route', () => {
     expect(httpResponse).toEqual(HttpResponse.unauthorized())
   })
   test('should return 500 when AuthUseCase is not provided', async () => {
-    const sut = new LoginRoute(null, makeEmailValidatorMock())
+    const sut = new LoginRoute({ authUseCase: null, emailValiadator: makeEmailValidatorMock() })
     const httpRequest = {
       body: {
         email: 'any_email@mail.com',
@@ -70,7 +70,7 @@ describe('Login Route', () => {
     expect(httpResponse).toEqual(HttpResponse.serverError())
   })
   test('should return 500 when AuthUseCase.auth is not provided', async () => {
-    const sut = new LoginRoute({}, makeEmailValidatorMock())
+    const sut = new LoginRoute({ authUseCase: {}, emailValidator: makeEmailValidatorMock() })
     const httpRequest = {
       body: {
         email: 'any_email@mail.com',
@@ -108,7 +108,7 @@ describe('Login Route', () => {
     expect(httpResponse).toEqual(HttpResponse.badRequest(new InvalidParamError('email')))
   })
   test('should return 500 when EmailValidator is not provided', async () => {
-    const sut = new LoginRoute(makeAuthUseCaseMock())
+    const sut = new LoginRoute({ authUseCase: makeAuthUseCaseMock() })
     const httpRequest = {
       body: {
         email: 'any_email@mail.com',
@@ -119,7 +119,7 @@ describe('Login Route', () => {
     expect(httpResponse).toEqual(HttpResponse.serverError())
   })
   test('should return 500 when EmailValidator.isValid is not provided', async () => {
-    const sut = new LoginRoute(makeAuthUseCaseMock(), {})
+    const sut = new LoginRoute({ authUseCase: makeAuthUseCaseMock(), emailValidator: {} })
     const httpRequest = {
       body: {
         email: 'any_email@mail.com',
@@ -171,7 +171,8 @@ describe('Login Route', () => {
 function makeSut () {
   const authUseCaseMock = makeAuthUseCaseMock()
   const emailValidatorMock = makeEmailValidatorMock()
-  const sut = new LoginRoute(authUseCaseMock, emailValidatorMock)
+  const sut = new LoginRoute({ authUseCase: authUseCaseMock, emailValidator: emailValidatorMock }
+  )
   return {
     authUseCaseMock,
     emailValidatorMock,
