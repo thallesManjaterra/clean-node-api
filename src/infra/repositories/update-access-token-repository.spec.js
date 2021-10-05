@@ -3,6 +3,8 @@ const MongoHelper = require('./helpers/mongo-helper.js')
 const { MissingParamError } = require('../../utils/errors')
 
 describe('UpdateAccessToken Repository', () => {
+  let fakeUserId = null
+
   beforeAll(async () => {
     await MongoHelper.connect(global.__MONGO_URI__)
   })
@@ -10,6 +12,8 @@ describe('UpdateAccessToken Repository', () => {
   beforeEach(async () => {
     const userModel = await MongoHelper.getCollection('users')
     await userModel.deleteMany({})
+    const fakeInsertedUser = await insertFakeUser(userModel)
+    fakeUserId = fakeInsertedUser._id
   })
 
   afterAll(async () => {
@@ -18,22 +22,18 @@ describe('UpdateAccessToken Repository', () => {
 
   test('should update the user with the given access token', async () => {
     const { sut, userModel } = await makeSut()
-    const fakeInsertedUser = await insertFakeUser(userModel)
-    await sut.update(fakeInsertedUser._id, makeFakeToken())
-    const fakeUser = await userModel.findOne({ _id: makeFakeUser()._id })
+    await sut.update(fakeUserId, makeFakeToken())
+    const fakeUser = await getFakeUser(userModel)
     expect(fakeUser.accessToken).toBe(makeFakeToken())
   })
   test('should throw if no userModel is provided', async () => {
     const sut = new UpdateAccessTokenRepository()
-    const userModel = await MongoHelper.getCollection('users')
-    const fakeInsertedUser = await insertFakeUser(userModel)
-    await expect(sut.update(fakeInsertedUser._id, makeFakeToken())).rejects.toThrow()
+    await expect(sut.update(fakeUserId, makeFakeToken())).rejects.toThrow()
   })
   test('should throw if no params are provided', async () => {
-    const { sut, userModel } = await makeSut()
+    const { sut } = await makeSut()
     await expect(sut.update()).rejects.toThrow(new MissingParamError('userId'))
-    const fakeInsertedUser = await insertFakeUser(userModel)
-    await expect(sut.update(fakeInsertedUser._id)).rejects.toThrow(new MissingParamError('accessToken'))
+    await expect(sut.update(fakeUserId)).rejects.toThrow(new MissingParamError('accessToken'))
   })
 })
 
