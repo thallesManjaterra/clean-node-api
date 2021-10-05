@@ -2,6 +2,10 @@ const TokenGenerator = require('./token-generator')
 const jwt = require('jsonwebtoken')
 const { MissingParamError } = require('../errors')
 
+jest.mock('jsonwebtoken', () => ({
+  sign: jest.fn(() => 'any_token')
+}))
+
 const SECRET_KEY = 'secret_key'
 
 describe('Token Generator', () => {

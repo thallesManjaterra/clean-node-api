@@ -154,7 +154,7 @@ function makeLoadUserByEmailRepository () {
   return {
     load: jest.fn(async () =>
       Promise.resolve({
-        id: makeFakeId(),
+        _id: makeFakeId(),
         password: makeFakeHashedPassword()
       })
     )

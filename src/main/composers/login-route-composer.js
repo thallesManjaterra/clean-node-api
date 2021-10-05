@@ -13,11 +13,11 @@ class LoginRouteComposer {
     const updateAccessTokenRepository = new UpdateAccessTokenRepository()
     const encrypter = new Encrypter()
     const tokenGenerator = new TokenGenerator(env.secretKey)
-    const authUsecase = new AuthUseCase({
+    const authUseCase = new AuthUseCase({
       loadUserByEmailRepository, updateAccessTokenRepository, encrypter, tokenGenerator
     })
     const emailValidator = new EmailValidator()
-    const loginRoute = new LoginRoute({ authUsecase, emailValidator })
+    const loginRoute = new LoginRoute({ authUseCase, emailValidator })
     return loginRoute
   }
 }

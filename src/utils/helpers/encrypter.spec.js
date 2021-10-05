@@ -2,6 +2,10 @@ const Encrypter = require('./encrypter')
 const bcrypt = require('bcrypt')
 const { MissingParamError } = require('../errors')
 
+jest.mock('bcrypt', () => ({
+  compare: jest.fn(async () => Promise.resolve(true))
+}))
+
 describe('Encrypter', () => {
   test('should return true if bcrypt.compare returns true', async () => {
     const sut = makeSut()

@@ -2,6 +2,10 @@ const EmailValidator = require('./email-validator')
 const validator = require('validator')
 const { MissingParamError } = require('../errors')
 
+jest.mock('validator', () => ({
+  isEmail: jest.fn(() => true)
+}))
+
 describe('Email Validator', () => {
   test('should return true if validator returns true', () => {
     const sut = makeSut()

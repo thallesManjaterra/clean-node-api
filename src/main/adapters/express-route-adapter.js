@@ -2,7 +2,7 @@ class ExpressRouteAdapter {
   static adapt (route) {
     return (req, res) => {
       const httpRequest = {
-        body: req.bod
+        body: req.body
       }
       route
         .handle(httpRequest)

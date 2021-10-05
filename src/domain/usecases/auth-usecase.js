@@ -18,8 +18,8 @@ class AuthUseCase {
     const user = await this.loadUserByEmailRepository.load(email)
     const thereIsTheUserAndPasswordIsValid = user && await this.encrypter.compare(password, user.password)
     if (thereIsTheUserAndPasswordIsValid) {
-      const accessToken = this.tokenGenerator.generate(user.id)
-      await this.updateAccessTokenRepository.update(user.id, accessToken)
+      const accessToken = this.tokenGenerator.generate(user._id)
+      await this.updateAccessTokenRepository.update(user._id, accessToken)
       return accessToken
     }
     return null
