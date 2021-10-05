@@ -2,8 +2,9 @@
   "name": "clean-node-api",
   "version": "1.0.0",
   "description": "Construindo API REST em NodeJS utilizando TDD, Clean Architecture e Design Patterns",
-  "main": "index.js",
+  "main": "src/main/index.js",
   "scripts": {
+    "start": "node src/main/index.js",
     "test": "jest --noStackTrace",
     "test:unit": "npm test -- -c jest-unit-config.js --watch",
     "test:integration": "npm test -- -c jest-integration-config.js --watch",
@@ -35,6 +36,7 @@
   },
   "dependencies": {
     "bcrypt": "^5.0.1",
+    "express": "^4.17.1",
     "jsonwebtoken": "^8.5.1",
     "mongodb": "^4.1.2",
     "validator": "^13.6.0"
