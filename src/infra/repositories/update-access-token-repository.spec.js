@@ -18,15 +18,26 @@ describe('UpdateAccessToken Repository', () => {
   test('should update the user with the given access token', async () => {
     const userModel = await MongoHelper.getCollection('users')
     const sut = new UpdateAccessTokenRepository(userModel)
-    await insertFakeUser(userModel)
-    await sut.update('any_id', makeFakeToken())
+    const fakeInsertedUser = await insertFakeUser(userModel)
+    await sut.update(fakeInsertedUser._id, makeFakeToken())
     const fakeUser = await userModel.findOne({ _id: makeFakeUser()._id })
     expect(fakeUser.accessToken).toBe(makeFakeToken())
   })
+  test('should throw if no userModel is provided', async () => {
+    const sut = new UpdateAccessTokenRepository()
+    const userModel = await MongoHelper.getCollection('users')
+    const fakeInsertedUser = await insertFakeUser(userModel)
+    await expect(sut.update(fakeInsertedUser._id, makeFakeToken())).rejects.toThrow()
+  })
 })
+
+async function getFakeUser (userModel) {
+  return await userModel.findOne()
+}
 
 async function insertFakeUser (userModel) {
   await userModel.insertOne(makeFakeUser())
+  return await getFakeUser(userModel)
 }
 
 function makeFakeUser () {
